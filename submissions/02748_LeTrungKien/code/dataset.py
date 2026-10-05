@@ -97,10 +97,9 @@ def check_split(train_df: pd.DataFrame, val_df: pd.DataFrame, test_df: pd.DataFr
         },
     }
 
-    print("=== DẠNG CHIA DỮ LIỆU ĐÃ KIỂM TRA THÀNH CÔNG (S1-S4) ===")
-    print(f"Train: {n_train} ({n_train/n_total:.1%}), Val: {n_val} ({n_val/n_total:.1%}), Test: {n_test} ({n_test/n_total:.1%})")
-    print(f"Giao giữa các tập: train∩val={len(train_val_overlap)}, train∩test={len(train_test_overlap)}, val∩test={len(val_test_overlap)}")
-    print(f"Kiểm tra file đĩa: Tất cả {len(all_files)} file tồn tại đầy đủ.\n")
+    print("=== CHIA DU LIEU DA KIEM TRA THANH CONG (S1-S4) ===")
+    print(f"Train: {n_train}, Val: {n_val}, Test: {n_test}")
+    print(f"Kiem tra file dia: Tat ca {len(all_files)} file ton tai day du.\n")
 
     return stats
 
@@ -193,8 +192,9 @@ def seed_worker(worker_id):
 
 
 def make_loader(df: pd.DataFrame, images_dir: str | Path, transform, batch_size: int,
-                train: bool, sampler: str | None = None, num_workers: int = 2):
+                train: bool, sampler: str | None = None, num_workers: int = 0):
     """Tạo DataLoader cho DeepWeeds.
+    Dùng num_workers=0 và pin_memory=False trên Windows để tránh lỗi Shared Memory (code 1455).
     """
     dataset = DeepWeedsDataset(df, images_dir, transform=transform)
 
@@ -212,8 +212,8 @@ def make_loader(df: pd.DataFrame, images_dir: str | Path, transform, batch_size:
                 dataset,
                 batch_size=batch_size,
                 sampler=sampler_obj,
-                num_workers=num_workers,
-                pin_memory=True,
+                num_workers=0,
+                pin_memory=False,
                 drop_last=True,
                 worker_init_fn=seed_worker,
             )
@@ -222,8 +222,8 @@ def make_loader(df: pd.DataFrame, images_dir: str | Path, transform, batch_size:
                 dataset,
                 batch_size=batch_size,
                 shuffle=True,
-                num_workers=num_workers,
-                pin_memory=True,
+                num_workers=0,
+                pin_memory=False,
                 drop_last=True,
                 worker_init_fn=seed_worker,
             )
@@ -233,8 +233,8 @@ def make_loader(df: pd.DataFrame, images_dir: str | Path, transform, batch_size:
             dataset,
             batch_size=batch_size,
             shuffle=False,
-            num_workers=num_workers,
-            pin_memory=True,
+            num_workers=0,
+            pin_memory=False,
             drop_last=False,
         )
 
